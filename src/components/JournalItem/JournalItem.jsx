@@ -1,6 +1,6 @@
 import './JournalItem.css';
 
-const JournalItem = ({ title, text, date }) => {
+const JournalItem = ({ title, text, date, id }) => {
   let formattedDate = 'Invalid date';
 
   if (date instanceof Date && !isNaN(date)) {
