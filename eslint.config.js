@@ -35,6 +35,7 @@ export default [
       ],
       semi: ['error', 'always', { omitLastInOneLineBlock: false }],
       quotes: ['error', 'single'],
+      'react/props-types': [0],
     },
   },
 ];
