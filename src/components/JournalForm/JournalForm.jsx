@@ -1,9 +1,16 @@
 import { useState } from 'react';
+import cn from 'classnames';
+import { RiFolder6Line, RiCalendar2Line, RiArchiveLine } from 'react-icons/ri';
 
-import './JournalForm.css';
+import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
 
 const JournalForm = ({ onSubmit }) => {
+  const [formValidState, setFormValidState] = useState({
+    title: true,
+    date: true,
+    text: true,
+  });
   const [dateInput, setDateInput] = useState('');
 
   const changeDateInput = (event) => {
@@ -17,26 +24,83 @@ const JournalForm = ({ onSubmit }) => {
     const formData = new FormData(event.target);
     const formProps = Object.fromEntries(formData);
 
+    if (formProps.title.trim().length > 0) {
+      setFormValidState((state) => ({ ...state, title: true }));
+    } else {
+      setFormValidState((state) => ({ ...state, title: false }));
+    }
+
+    if (formProps.text.trim().length > 0) {
+      setFormValidState((state) => ({ ...state, text: true }));
+    } else {
+      setFormValidState((state) => ({ ...state, text: false }));
+    }
+
     const formattedDate = new Date(dateInput);
 
     if (isNaN(formattedDate.getTime())) {
       console.error('Invalid date');
+      setFormValidState((state) => ({ ...state, date: false }));
       return;
+    } else {
+      formProps.date = formattedDate;
+      setFormValidState((state) => ({ ...state, date: true }));
     }
 
-    formProps.date = formattedDate;
-
-    console.log('formProps: ', formProps);
+    if (!formValidState.title || !formValidState.date || !formValidState.text) {
+      console.error('Form is not valid');
+      return;
+    }
 
     onSubmit(formProps);
   };
 
   return (
-    <form className="journal-form" onSubmit={addJournalItem}>
-      <input type="text" name="title" />
-      <input type="date" value={dateInput} onChange={changeDateInput} />
-      <input name="tag" />
-      <textarea name="text" id="" cols="30" rows="10"></textarea>
+    <form className={styles['journal-form']} onSubmit={addJournalItem}>
+      <div className={cn(styles['input-wrap'])}>
+        <input
+          type="text"
+          name="title"
+          className={cn(styles['input-title'], {
+            [styles['invalid']]: !formValidState.title,
+          })}
+        />
+        <RiArchiveLine />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="date" className={styles['form-label']}>
+          <RiCalendar2Line />
+          <span>Date</span>
+        </label>
+        <input
+          type="date"
+          id="date"
+          value={dateInput}
+          className={`${styles['input']} ${
+            formValidState.date ? '' : styles['invalid']
+          }`}
+          onChange={changeDateInput}
+        />
+      </div>
+
+      <div className={styles['form-row']}>
+        <label htmlFor="tag" className={styles['form-label']}>
+          <RiFolder6Line />
+          <span>Tag</span>
+        </label>
+        <RiFolder6Line />
+        <input name="tag" id="tag" />
+      </div>
+
+      <textarea
+        className={`${styles['input']} ${
+          formValidState.text ? '' : styles['invalid']
+        }`}
+        name="text"
+        cols="30"
+        rows="10"
+      ></textarea>
       <Button text={'Save'} onClick={() => console.log('pressed')} />
     </form>
   );

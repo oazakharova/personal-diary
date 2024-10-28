@@ -1,7 +1,7 @@
-import './Header.css';
+import styles from './Header.module.css';
 
 const Header = () => {
-  return <>Personal Journal</>;
+  return <div className={styles.logo}>Personal Journal</div>;
 };
 
 export default Header;
