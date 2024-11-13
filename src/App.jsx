@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import './App.css';
@@ -14,18 +14,36 @@ const INITIAL_DATA = [
     id: uuidv4(),
     title: 'Подготовка к обновлению',
     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
-    date: new Date(),
+    date: '2024/05/18',
   },
   {
     id: uuidv4(),
     title: 'Поход в горы',
     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
-    date: new Date(),
+    date: '2024/12/23',
   },
 ];
 
 function App() {
   const [items, setItems] = useState(INITIAL_DATA);
+
+  useEffect(() => {
+    if (items.length) {
+      localStorage.setItem('diaryItems', JSON.stringify(items));
+    }
+  }, [items]);
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem('diaryItems'));
+    if (data) {
+      setItems(
+        data.map((item) => ({
+          ...item,
+          date: new Date(item.date),
+        }))
+      );
+    }
+  }, []);
 
   const addItem = (item) => {
     setItems((prevItems) => [

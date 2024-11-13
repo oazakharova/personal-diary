@@ -27,6 +27,19 @@
   font-family: 'Source Sans 3', sans-serif;
 }
 
+.input {
+  border: 1px solid grey;
+  border-radius: 5px;
+  background: none;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  font-family: 'Source Sans 3', sans-serif;
+  width: 100%;
+  color: white;
+}
+
 .invalid {
   border: 2px solid red;
   background: rgb(68, 6, 6);
@@ -42,15 +55,4 @@
   display: flex;
   align-items: center;
   gap: 20px;
-}
-
-.input {
-  border: none;
-  background: none;
-  font-style: 14px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  font-family: 'Source Sans 3', sans-serif;
-  width: 100%;
 }

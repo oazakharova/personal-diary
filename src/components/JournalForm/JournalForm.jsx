@@ -1,21 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import cn from 'classnames';
 import { RiFolder6Line, RiCalendar2Line, RiArchiveLine } from 'react-icons/ri';
 
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
 
+const INITIAL_STATE = {
+  title: true,
+  date: true,
+  text: true,
+  tag: true,
+};
+
 const JournalForm = ({ onSubmit }) => {
-  const [formValidState, setFormValidState] = useState({
-    title: true,
-    date: true,
-    text: true,
-  });
+  const [formValidState, setFormValidState] = useState(INITIAL_STATE);
+
+  const [titleInput, setTitleInput] = useState('');
   const [dateInput, setDateInput] = useState('');
+  const [tagInput, setTagInput] = useState('');
+  const [textInput, setTextInput] = useState('');
+
+  useEffect(() => {
+    let timerId;
+    if (!formValidState.date || !formValidState.text || !formValidState.title) {
+      timerId = setTimeout(() => {
+        setFormValidState(INITIAL_STATE);
+      }, 2000);
+    }
+    return () => clearTimeout(timerId); // для очистки состояния
+  }, [formValidState]);
 
   const changeDateInput = (event) => {
     setDateInput(event.target.value);
-    console.log(event.target.value);
+    // console.log(event.target.value);
   };
 
   const addJournalItem = (event) => {
@@ -53,6 +70,12 @@ const JournalForm = ({ onSubmit }) => {
     }
 
     onSubmit(formProps);
+
+    event.target.reset();
+    setTitleInput('');
+    setDateInput('');
+    setTagInput('');
+    setTextInput('');
   };
 
   return (
@@ -77,9 +100,9 @@ const JournalForm = ({ onSubmit }) => {
           type="date"
           id="date"
           value={dateInput}
-          className={`${styles['input']} ${
-            formValidState.date ? '' : styles['invalid']
-          }`}
+          className={cn(styles['input'], {
+            [styles['invalid']]: !formValidState.date,
+          })}
           onChange={changeDateInput}
         />
       </div>
@@ -90,13 +113,13 @@ const JournalForm = ({ onSubmit }) => {
           <span>Tag</span>
         </label>
         <RiFolder6Line />
-        <input name="tag" id="tag" />
+        <input name="tag" id="tag" className={styles['input']} />
       </div>
 
       <textarea
-        className={`${styles['input']} ${
-          formValidState.text ? '' : styles['invalid']
-        }`}
+        className={cn(styles['input'], {
+          [styles['invalid']]: !formValidState.text,
+        })}
         name="text"
         cols="30"
         rows="10"
