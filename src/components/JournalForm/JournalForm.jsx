@@ -1,34 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import cn from 'classnames';
 import { RiFolder6Line, RiCalendar2Line, RiArchiveLine } from 'react-icons/ri';
 
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
-
-const INITIAL_STATE = {
-  title: true,
-  date: true,
-  text: true,
-  tag: true,
-};
+import { formReducer, INITIAL_STATE } from './JournalForm.state';
 
 const JournalForm = ({ onSubmit }) => {
-  const [formValidState, setFormValidState] = useState(INITIAL_STATE);
-
-  const [titleInput, setTitleInput] = useState('');
-  const [dateInput, setDateInput] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [textInput, setTextInput] = useState('');
+  const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
+  const { isValid } = formState;
 
   useEffect(() => {
     let timerId;
-    if (!formValidState.date || !formValidState.text || !formValidState.title) {
+    if (!isValid.date || !isValid.text || !isValid.title) {
       timerId = setTimeout(() => {
-        setFormValidState(INITIAL_STATE);
+        dispatchForm({ type: 'RESET_VALIDITY' });
       }, 2000);
     }
     return () => clearTimeout(timerId); // для очистки состояния
-  }, [formValidState]);
+  }, [isValid]);
 
   const changeDateInput = (event) => {
     setDateInput(event.target.value);
@@ -85,7 +75,7 @@ const JournalForm = ({ onSubmit }) => {
           type="text"
           name="title"
           className={cn(styles['input-title'], {
-            [styles['invalid']]: !formValidState.title,
+            [styles['invalid']]: !isValid.title,
           })}
         />
         <RiArchiveLine />
@@ -101,7 +91,7 @@ const JournalForm = ({ onSubmit }) => {
           id="date"
           value={dateInput}
           className={cn(styles['input'], {
-            [styles['invalid']]: !formValidState.date,
+            [styles['invalid']]: !isValid.date,
           })}
           onChange={changeDateInput}
         />
@@ -118,7 +108,7 @@ const JournalForm = ({ onSubmit }) => {
 
       <textarea
         className={cn(styles['input'], {
-          [styles['invalid']]: !formValidState.text,
+          [styles['invalid']]: !isValid.text,
         })}
         name="text"
         cols="30"
