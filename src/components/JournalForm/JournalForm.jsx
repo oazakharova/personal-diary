@@ -25,7 +25,7 @@ const JournalForm = ({ onSubmit }) => {
       onSubmit(values);
       dispatchForm({ type: 'CLEAR' });
     }
-  }, [isFormReadyToSubmit]);
+  }, [isFormReadyToSubmit, onSubmit, values]);
 
   const onChangeValue = (event) => {
     dispatchForm({
