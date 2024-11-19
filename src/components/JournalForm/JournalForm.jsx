@@ -8,11 +8,11 @@ import { formReducer, INITIAL_STATE } from './JournalForm.state';
 
 const JournalForm = ({ onSubmit }) => {
   const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
-  const { isValid } = formState;
+  const { isValid, isFormReadyToSubmit, values } = formState;
 
   useEffect(() => {
     let timerId;
-    if (!isValid.date || !isValid.text || !isValid.title) {
+    if (!isValid.date || !isValid.post || !isValid.title) {
       timerId = setTimeout(() => {
         dispatchForm({ type: 'RESET_VALIDITY' });
       }, 2000);
@@ -20,9 +20,18 @@ const JournalForm = ({ onSubmit }) => {
     return () => clearTimeout(timerId); // для очистки состояния
   }, [isValid]);
 
-  const changeDateInput = (event) => {
-    setDateInput(event.target.value);
-    // console.log(event.target.value);
+  useEffect(() => {
+    if (isFormReadyToSubmit) {
+      onSubmit(values);
+      dispatchForm({ type: 'CLEAR' });
+    }
+  }, [isFormReadyToSubmit]);
+
+  const onChangeValue = (event) => {
+    dispatchForm({
+      type: 'UPDATE_VALUE',
+      payload: { [event.target.name]: event.target.value },
+    });
   };
 
   const addJournalItem = (event) => {
@@ -31,41 +40,7 @@ const JournalForm = ({ onSubmit }) => {
     const formData = new FormData(event.target);
     const formProps = Object.fromEntries(formData);
 
-    if (formProps.title.trim().length > 0) {
-      setFormValidState((state) => ({ ...state, title: true }));
-    } else {
-      setFormValidState((state) => ({ ...state, title: false }));
-    }
-
-    if (formProps.text.trim().length > 0) {
-      setFormValidState((state) => ({ ...state, text: true }));
-    } else {
-      setFormValidState((state) => ({ ...state, text: false }));
-    }
-
-    const formattedDate = new Date(dateInput);
-
-    if (isNaN(formattedDate.getTime())) {
-      console.error('Invalid date');
-      setFormValidState((state) => ({ ...state, date: false }));
-      return;
-    } else {
-      formProps.date = formattedDate;
-      setFormValidState((state) => ({ ...state, date: true }));
-    }
-
-    if (!formValidState.title || !formValidState.date || !formValidState.text) {
-      console.error('Form is not valid');
-      return;
-    }
-
-    onSubmit(formProps);
-
-    event.target.reset();
-    setTitleInput('');
-    setDateInput('');
-    setTagInput('');
-    setTextInput('');
+    dispatchForm({ type: 'SUBMIT', payload: formProps });
   };
 
   return (
@@ -77,6 +52,8 @@ const JournalForm = ({ onSubmit }) => {
           className={cn(styles['input-title'], {
             [styles['invalid']]: !isValid.title,
           })}
+          value={values.title}
+          onChange={onChangeValue}
         />
         <RiArchiveLine />
       </div>
@@ -89,11 +66,12 @@ const JournalForm = ({ onSubmit }) => {
         <input
           type="date"
           id="date"
-          value={dateInput}
+          name="date"
+          value={values.date}
           className={cn(styles['input'], {
             [styles['invalid']]: !isValid.date,
           })}
-          onChange={changeDateInput}
+          onChange={onChangeValue}
         />
       </div>
 
@@ -103,17 +81,26 @@ const JournalForm = ({ onSubmit }) => {
           <span>Tag</span>
         </label>
         <RiFolder6Line />
-        <input name="tag" id="tag" className={styles['input']} />
+        <input
+          name="tag"
+          id="tag"
+          value={values.tag}
+          onChange={onChangeValue}
+          className={styles['input']}
+        />
       </div>
 
       <textarea
         className={cn(styles['input'], {
-          [styles['invalid']]: !isValid.text,
+          [styles['invalid']]: !isValid.post,
         })}
-        name="text"
+        name="post"
+        value={values.post}
+        onChange={onChangeValue}
         cols="30"
         rows="10"
       ></textarea>
+
       <Button text={'Save'} onClick={() => console.log('pressed')} />
     </form>
   );

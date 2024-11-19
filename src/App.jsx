@@ -13,13 +13,13 @@ const INITIAL_DATA = [
   {
     id: uuidv4(),
     title: 'Подготовка к обновлению',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
+    post: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
     date: '2024/05/18',
   },
   {
     id: uuidv4(),
     title: 'Поход в горы',
-    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
+    post: 'Lorem ipsum dolor sit amet, consectetur adipiscing',
     date: '2024/12/23',
   },
 ];
@@ -51,7 +51,7 @@ function App() {
       {
         id: uuidv4(),
         title: item.title,
-        text: item.text,
+        post: item.post,
         date: new Date(item.date),
       },
     ]);
